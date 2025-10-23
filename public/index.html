@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Feedback System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        @media (max-width: 768px) {
+            .card-hover:hover {
+                transform: none;
+            }
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes bounceIn {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.3); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.05); 
+            }
+            70% { 
+                transform: scale(0.9); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            50% { 
+                transform: scale(1.05); 
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success animation */
+        .success-checkmark {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            stroke-width: 2;
+            stroke: #4CAF50;
+            stroke-miterlimit: 10;
+            animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+        }
+        
+        @keyframes fill {
+            100% { box-shadow: inset 0px 0px 0px 30px #4CAF50; }
+        }
+        
+        @keyframes scale {
+            0%, 100% { transform: none; }
+            50% { transform: scale3d(1.1, 1.1, 1); }
+        }
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-mid { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
+        .status-pending { color: #f59e0b; }
+        .status-in_progress { color: #3b82f6; }
+        .status-resolved { color: #10b981; }
+        .status-rejected { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-comments text-white text-2xl mr-3"></i>
+                    <h1 class="text-white text-xl font-bold">College Feedback System</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                    <button id="registerBtn" class="bg-white text-purple-600 hover:bg-gray-100 px-4 py-2 rounded-md font-medium">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </button>
+                    <button id="logoutBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md hidden">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div id="welcomeSection" class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Anonymous Feedback System</h2>
+            <p class="text-lg text-gray-600 mb-8">Share your feedback anonymously and track its status</p>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <i class="fas fa-shield-alt text-3xl text-blue-500 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Anonymous</h3>
+                    <p class="text-gray-600">Your identity is protected with secure passkeys</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <i class="fas fa-chart-line text-3xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Network Analysis</h3>
+                    <p class="text-gray-600">Find the best network spots on campus</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <i class="fas fa-clock text-3xl text-purple-500 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Priority System</h3>
+                    <p class="text-gray-600">Choose urgency level for your feedback</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login/Register Forms -->
+        <div id="authSection" class="hidden">
+            <div class="max-w-md mx-auto">
+                <!-- Login Form -->
+                <div id="loginForm" class="bg-white p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold text-center mb-6">Login</h3>
+                    <form id="loginFormElement">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                            <input type="email" id="loginEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                            <input type="password" id="loginPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Login
+                        </button>
+                    </form>
+                    <p class="text-center mt-4">
+                        Don't have an account? 
+                        <button id="showRegister" class="text-blue-500 hover:underline">Register here</button>
+                    </p>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerForm" class="bg-white p-8 rounded-lg shadow-md hidden">
+                    <h3 class="text-2xl font-bold text-center mb-6">Register</h3>
+                    <form id="registerFormElement">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                            <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                            <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">College</label>
+                            <input type="text" id="registerCollege" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                            <select id="registerRole" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="user">Student</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            Register
+                        </button>
+                    </form>
+                    <p class="text-center mt-4">
+                        Already have an account? 
+                        <button id="showLogin" class="text-blue-500 hover:underline">Login here</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="userDashboard" class="hidden">
+            <!-- Home Page with 3 Main Options -->
+            <div id="userHomePage">
+                <!-- Welcome Message -->
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to Your Dashboard</h2>
+                    <p class="text-lg text-gray-600">Choose an option below to get started</p>
+                </div>
+
+                <!-- 3 Main Options -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Option 1: Submit Feedback -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg card-hover cursor-pointer bounce-in" onclick="showFeedbackPage()" style="animation-delay: 0.1s;">
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 pulse">
+                                <i class="fas fa-paper-plane text-2xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Submit Feedback</h3>
+                            <p class="text-gray-600">Share your concerns and suggestions anonymously</p>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Track Feedback -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg card-hover cursor-pointer bounce-in" onclick="showTrackingPage()" style="animation-delay: 0.2s;">
+                        <div class="text-center">
+                            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 pulse">
+                                <i class="fas fa-search text-2xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Track Feedback</h3>
+                            <p class="text-gray-600">Check the status of your submitted feedback</p>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Network Analyzer -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg card-hover cursor-pointer bounce-in" onclick="showNetworkPage()" style="animation-delay: 0.3s;">
+                        <div class="text-center">
+                            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 pulse">
+                                <i class="fas fa-wifi text-2xl text-purple-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Network Analyzer</h3>
+                            <p class="text-gray-600">Find the best WiFi spots on campus</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Submitted Feedbacks -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">
+                        <i class="fas fa-list mr-2"></i>My Submitted Feedbacks
+                    </h3>
+                    <div id="myFeedbacks" class="space-y-3">
+                        <p class="text-gray-500 text-center py-4">No feedbacks submitted yet. Click "Submit Feedback" to get started!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Submission Page -->
+            <div id="feedbackPage" class="hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center mb-6">
+                            <button onclick="showUserHomePage()" class="mr-4 text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-arrow-left text-xl"></i>
+                            </button>
+                            <h3 class="text-2xl font-bold">Submit New Feedback</h3>
+                        </div>
+                        
+                        <form id="feedbackForm">
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Title</label>
+                                <input type="text" id="feedbackTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Brief title of your feedback" required>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Message</label>
+                                <textarea id="feedbackMessage" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your feedback in detail..." required></textarea>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-3">Priority Level</label>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-400 transition-colors">
+                                        <input type="radio" name="priority" value="low" class="mr-3">
+                                        <div>
+                                            <div class="text-green-600 font-semibold">Low</div>
+                                            <div class="text-xs text-gray-500">General feedback</div>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+                                        <input type="radio" name="priority" value="mid" class="mr-3">
+                                        <div>
+                                            <div class="text-yellow-600 font-semibold">Mid</div>
+                                            <div class="text-xs text-gray-500">Important issue</div>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-400 transition-colors">
+                                        <input type="radio" name="priority" value="high" class="mr-3">
+                                        <div>
+                                            <div class="text-red-600 font-semibold">High</div>
+                                            <div class="text-xs text-gray-500">Urgent (requires subscription)</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Tracking Page -->
+            <div id="trackingPage" class="hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center mb-6">
+                            <button onclick="showUserHomePage()" class="mr-4 text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-arrow-left text-xl"></i>
+                            </button>
+                            <h3 class="text-2xl font-bold">Track Your Feedback</h3>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Enter Your Passkey</label>
+                            <div class="flex space-x-4">
+                                <input type="text" id="statusPasskey" placeholder="Enter 10-digit passkey" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" maxlength="10">
+                                <button id="checkStatus" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold">
+                                    <i class="fas fa-search mr-2"></i>Check Status
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="statusResult" class="hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Analyzer Page -->
+            <div id="networkPage" class="hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center mb-6">
+                            <button onclick="showUserHomePage()" class="mr-4 text-gray-600 hover:text-gray-800">
+                                <i class="fas fa-arrow-left text-xl"></i>
+                            </button>
+                            <h3 class="text-2xl font-bold">Network Analyzer</h3>
+                        </div>
+                        
+                        <div class="text-center mb-8">
+                            <button id="getLocation" class="bg-purple-500 text-white py-4 px-8 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-lg">
+                                <i class="fas fa-map-marker-alt mr-2"></i>Analyze Current Location
+                            </button>
+                            <p class="text-gray-600 mt-2">Find the best WiFi spots based on crowd data</p>
+                        </div>
+                        
+                        <div id="networkResults" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-6">
+                    <i class="fas fa-tasks mr-2"></i>Feedback Management
+                </h3>
+                <div id="adminFeedbacks" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <h3 class="text-xl font-semibold mb-4">Subscribe for High Priority</h3>
+                <p class="text-gray-600 mb-4">Get access to high priority feedback submission for $9.99/month</p>
+                <div id="card-element" class="mb-4 p-3 border border-gray-300 rounded-md"></div>
+                <div class="flex space-x-4">
+                    <button id="confirmPayment" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                        Pay $9.99
+                    </button>
+                    <button id="cancelPayment" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg hidden z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
